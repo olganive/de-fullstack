@@ -1,8 +1,9 @@
 # de-fullstack
-The data engineering side of the data-eng-fullstack project. This includes the databases,  the datasets etc.
 
-
-Building a user facing live dashboard/used in cubes - using apache pinot for user-facing realtime analytics.
+#### Usecases
+This is useful for user facing analytics that require up to date and fresh changes. Instead of batch processes at a certain time, changes can be made an reflected in almost real time including the transformations (aggregations, upserts) needed for the full analytical dataset. This allowed end users to view their data up to date all the time.
+This can be useful for feature stores in machine learning teams as well.
+Pinot is designed to execute OLAP queries with low latency. It is suited in contexts where fast analytics, such as aggregations, are needed on immutable data, possibly, with real-time data ingestion.
 
 ## Proposed Design:
 - [Postgres database](https://www.postgresql.org/about/) to store our data.
@@ -12,11 +13,6 @@ Building a user facing live dashboard/used in cubes - using apache pinot for use
 - [Superset](https://superset.apache.org/docs/intro/) to visualise these changes in real time .
 
 Each of the above will run on Docker using docker-compose.
-
-#### Usecases
-This is useful for user facing analytics that require up to date and fresh changes. Instead of batch processes at a certain time, changes can be made an reflected in almost real time including the transformations (aggregations, upserts) needed for the full analytical dataset. This allowed end users to view their data up to date all the time.
-This can be useful for feature stores in machine learning teams as well.
-Pinot is designed to execute OLAP queries with low latency. It is suited in contexts where fast analytics, such as aggregations, are needed on immutable data, possibly, with real-time data ingestion.
 
 ## Social media post
 [dev.to](https://dev.to/nvsk/data-transformations-on-streaming-data-1pae-temp-slug-2760683?preview=25f97e65807b910fa1d70ebe04c2ded8ab8a42fd7327ed4d92136d1db461236ef96cd8409334221b27dd4d84814748d6de13d25b62b9892f1310f75b)
@@ -40,6 +36,7 @@ https://cnatsis.com/2022-07-12-pinot-cluster-docker/
 ### Playing PyFlink from Scratch
 https://dev.to/lazypro/playing-pyflink-from-scratch-54mh
 
+### Exploring Popular Open-source Stream Processing Technologies: Part 1 of 2
 https://itnext.io/exploring-popular-open-source-stream-processing-technologies-part-1-of-2-31069337ba0e
 
 ### CDC-based Upserts with Debezium, Apache Kafka, and Apache Pinot
