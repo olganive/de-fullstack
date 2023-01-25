@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+pinot/controller/
+pinot/kafka/data/
+pinot/server/
+pinot/zookeeper/

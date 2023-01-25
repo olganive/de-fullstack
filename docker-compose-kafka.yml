@@ -2,15 +2,21 @@ version: '2'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - ./pinot/zookeeper/data:/data
+      - ./pinot/zookeeper/datalog:/datalog
     ports:
       - 22181:2181
-  broker:
+    networks: ["de_fullstack_network"]
+
+  kafka-broker:
     image: confluentinc/cp-kafka:latest
-    # hostname: broker
-    # container_name: broker
+    hostname: kafka-broker
+    container_name: kafka-broker
     depends_on:
       - zookeeper
     ports:
@@ -21,12 +27,16 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092 # PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092,PLAINTEXT_HOST://localhost:29092 # PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_JMX_PORT: 9101
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+    volumes:
+      - ./pinot/kafka/data:/var/lib/kafka/data
+    networks: ["de_fullstack_network"]
 
   # kafka:
   #   image: confluentinc/cp-kafka:latest
@@ -46,6 +56,8 @@ services:
   #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
   #     KAFKA_JMX_PORT: 9101
 
+  ## KAFKA UI
+  ## https://github.com/provectus/kafka-ui
   kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
@@ -54,5 +66,8 @@ services:
     restart: always
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=broker:9092
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-broker:9092
       # - KAFKA_CLUSTERS_0_READONLY=true
+    networks: ["de_fullstack_network"]
+networks:
+  de_fullstack_network:
