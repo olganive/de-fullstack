@@ -1,0 +1,65 @@
+version: '2'
+services:
+  ## APACHE PINOT
+  ## https://github.com/apache/pinot/blob/master/docker/images/pinot/docker-compose.yml
+  pinot-controller:
+    image: apachepinot/pinot:latest
+    hostname: pinot-controller
+    container_name: pinot-controller
+    volumes:
+      - ./pinot/controller:/tmp/data/controller
+    ports:
+      - "9000:9000"
+    command: StartController -zkAddress zookeeper:2181
+    restart: unless-stopped
+    # depends_on:
+    #   - kafka-broker
+    healthcheck:
+        test: ["CMD", "curl", "-f http://kafka-broker:9092"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    networks: ["de_fullstack_network"]
+
+  pinot-broker:
+    image: apachepinot/pinot:latest
+    hostname: pinot-broker
+    container_name: pinot-broker
+    ports:
+      - "8099:8099"
+    command: StartBroker -zkAddress zookeeper:2181
+    restart: unless-stopped
+    depends_on:
+      # - zookeeper
+      # - kafka-broker
+      - pinot-controller
+    healthcheck:
+        test: ["CMD", "curl", "-f http://kafka-broker:9092 && -f http://zookeeper:2181"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    networks: ["de_fullstack_network"]
+
+  pinot-server:
+    image: apachepinot/pinot:latest
+    hostname: pinot-server
+    container_name: pinot-server
+    volumes:
+      - ./pinot/server:/tmp/data/server
+    ports:
+      - "8098:8098"
+    command: StartServer -zkAddress zookeeper:2181
+    restart: unless-stopped
+    depends_on:
+      # - zookeeper
+      # - kafka-broker
+      - pinot-controller
+    healthcheck:
+        test: ["CMD", "curl", "-f http://kafka-broker:9092 && -f http://zookeeper:2181"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    networks: ["de_fullstack_network"]
+
+networks:
+  de_fullstack_network:
